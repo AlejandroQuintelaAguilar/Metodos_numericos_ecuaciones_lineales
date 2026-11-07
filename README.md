@@ -5,7 +5,10 @@
 [![Tecnologías](https://img.shields.io/badge/Stack-HTML5%20%7C%20Tailwind%20%7C%20Chart.js-teal.svg)]()
 
 > **Proyecto:** Desafío Individual de Modelado con Ecuaciones Diferenciales Ordinarias (EDO) de Primer Orden  
+> **Estudiante:** [Ingresa aquí tu Nombre Completo]  
+> **Título del Desafío:** *«Huellitas Seguras: Dinámica de Adopción Comunitaria y Capacidad de Acogida»*  
 > **Materia:** Métodos Numéricos  
+> **Fecha de Entrega:** Noviembre 2026  
 
 ---
 
@@ -146,7 +149,25 @@ No requiere instalación de librerías ni dependencias pesadas:
 
 ---
 
-## 🎬 7. Estructura del Video Explicativo (1 Minuto)
+## ❓ 7. Respuesta a la Pregunta Guía Oficial
+
+> **Pregunta Guía:** *¿Cómo puede una ecuación diferencial de primer orden ayudarnos a comprender y mejorar una situación de nuestra comunidad, y qué tan precisas son las aproximaciones de Heun y RK4?*
+
+1. **Aporte Comunitario:** Una EDO de primer orden permite transformar un problema cualitativo (el entusiasmo y posterior agotamiento de adopciones en un refugio) en una herramienta predictiva cuantificable. Nos enseña que las intervenciones comunitarias tienen ventanas óptimas de acción: antes de la semana 12 las campañas tienen máximo retorno por el boca a boca; pasada esa fecha, el albergue debe diversificar su estrategia porque la capacidad local $K$ empieza a saturarse.
+2. **Precisión Numérica de Heun vs. RK4:**  
+   * El método de **Heun (RK2)**, con un orden de error $\mathcal{O}(h^2)$, presenta desviaciones de hasta $0.46\%$ para $h=1.0$ y $0.12\%$ para $h=0.5$. Es adecuado para cálculos rápidos de estimación preliminar.
+   * El método de **Runge-Kutta de 4.° orden (RK4)**, con un orden $\mathcal{O}(h^4)$, reduce el error a rangos infinitesimales de $10^{-4}\%$ a $10^{-5}\%$, siendo entre **450 y 1,800 veces más preciso que Heun**. En simulaciones de gestión de recursos críticos (medicinas, espacio físico o presupuesto), RK4 brinda la certeza requerida para evitar errores acumulados de toma de decisiones.
+
+---
+
+## ⚠️ 8. Declaración de Calidad y Limitaciones del Modelo
+
+* **Naturaleza de los parámetros:** Los parámetros ($y_0 = 20$, $K = 200$, $r = 0.25$) son hipotéticos y verosímiles, calibrados para representar el comportamiento típico documentado en campañas de adopción de tamaño medio.
+* **Limitaciones:** El modelo asume un entorno cerrado sin deserciones ni ingresos intempestivos de camadas grandes. No debe interpretarse como una predicción infalible sin contrastar con censos empíricos continuos de la población animal local.
+
+---
+
+## 🎬 9. Estructura del Video Explicativo (1 Minuto)
 
 | Segundo | Contenido / Pantalla | Diálogo sugerido |
 | :---: | :--- | :--- |
@@ -157,7 +178,7 @@ No requiere instalación de librerías ni dependencias pesadas:
 
 ---
 
-## 📂 8. Estructura de Archivos
+## 📂 10. Estructura de Archivos
 
 ```
 ├── index.html                           # Aplicación web interactiva SPA

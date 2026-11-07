@@ -452,12 +452,15 @@ function renderInterpretation(sim) {
     <div class="p-3 bg-white/80 rounded-xl border border-emerald-100 shadow-sm">
       <h4 class="font-bold text-emerald-950 flex items-center gap-1.5 text-sm mb-1">
         <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-        3. Toma de Decisiones y Recomendación para el Albergue
+        3. Toma de Decisiones y Limitaciones del Modelo
       </h4>
       <p class="text-xs text-slate-700">
         Entre las semanas 5 y 10 se observa la máxima pendiente de adopción (fase de mayor impacto del boca a boca). A partir de la semana 14, 
         el ritmo de adopciones se desacelera por la saturación de familias aptas. Se recomienda al equipo comunitario enfocar sus campañas 
-        de difusión externa y alianzas intermunicipales antes de la semana 12 para expandir la capacidad $K$ hacia nuevas zonas.
+        de difusión externa antes de la semana 12 para expandir la capacidad $K$ hacia nuevas zonas.
+      </p>
+      <p class="text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100 italic">
+        <strong>Nota metodológica:</strong> Los parámetros empleados son hipotéticos pero verosímiles, calibrados para fines de simulación académica. En una implementación real de campo, deben ajustarse continuamente con datos empíricos de acogida, estacionalidad y tasas de devolución.
       </p>
     </div>
   `;
