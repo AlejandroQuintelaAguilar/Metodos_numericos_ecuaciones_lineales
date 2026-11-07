@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador EDO | Modelo Logístico de Adopciones - Métodos Numéricos</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- KaTeX for LaTeX Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Encabezado / Header -->
+  <header class="bg-gradient-to-r from-emerald-800 via-teal-800 to-cyan-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 bg-emerald-500/20 backdrop-blur rounded-xl border border-emerald-400/30 text-emerald-300">
+            <i data-lucide="paw-print" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs uppercase tracking-wider font-semibold bg-emerald-400/20 text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-300/30">
+                Métodos Numéricos · Proyecto EDO
+              </span>
+              <span class="text-xs text-emerald-200/80 hidden sm:inline">Desafío Individual</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white mt-0.5">
+              Simulador de Adopciones: Heun vs. Runge-Kutta 4
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="#fundamentos" class="text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-emerald-100 px-3 py-2 rounded-lg transition flex items-center gap-1.5 border border-white/10">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>Modelo Teórico</span>
+          </a>
+          <button id="btnExportCSV" class="text-xs sm:text-sm bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-3.5 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Exportar CSV</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner Contextual Comunitario -->
+  <div class="bg-emerald-900/90 border-b border-emerald-700/50 text-emerald-100 text-sm py-2.5 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <i data-lucide="heart-handshake" class="w-4 h-4 text-emerald-300 flex-shrink-0"></i>
+        <span><strong>Impacto Social:</strong> Campaña <em>«Huellitas Seguras»</em> para el control ético de sobrepoblación animal y adopción responsable.</span>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-emerald-300">
+        <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+        <span>Meta: 80% de capacidad de carga ($K$)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+    <!-- Grid de Métricas / KPI Cards -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <!-- KPI 1 -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 p-5 hover:shadow-md transition">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Tiempo Meta (80% K)</span>
+          <div class="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
+            <i data-lucide="target" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiTargetTime" class="text-2xl font-bold text-slate-900">14.33</span>
+          <span class="text-xs text-slate-500 font-medium">semanas</span>
+        </div>
+        <p id="kpiTargetDesc" class="text-xs text-slate-500 mt-1">Para alcanzar 160 animales adoptados</p>
+      </div>
+
+      <!-- KPI 2 -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 p-5 hover:shadow-md transition">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Error Máx. Heun (RK2)</span>
+          <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+            <i data-lucide="activity" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiHeunError" class="text-2xl font-bold text-blue-700">0.124%</span>
+          <span class="text-xs text-slate-500 font-medium">relativo</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">Convergencia de 2.º orden $\mathcal{O}(h^2)$</p>
+      </div>
+
+      <!-- KPI 3 -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 p-5 hover:shadow-md transition">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Error Máx. RK4</span>
+          <div class="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiRK4Error" class="text-2xl font-bold text-emerald-700">0.00007%</span>
+          <span class="text-xs text-slate-500 font-medium">relativo</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">Convergencia de 4.º orden $\mathcal{O}(h^4)$</p>
+      </div>
+
+      <!-- KPI 4 -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 p-5 hover:shadow-md transition">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Ventaja de Precisión</span>
+          <div class="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+            <i data-lucide="award" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiPrecisionFactor" class="text-2xl font-bold text-purple-700">1,850x</span>
+          <span class="text-xs text-slate-500 font-medium">más exacto</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">RK4 frente a Heun en este ensayo</p>
+      </div>
+    </section>
+
+    <!-- Layout Principal: Controles (Izquierda) + Gráficos (Derecha) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+      
+      <!-- Panel de Configuración de Parámetros -->
+      <aside class="lg:col-span-4 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+            <div class="flex items-center gap-2 text-slate-900 font-bold text-base">
+              <i data-lucide="sliders" class="w-5 h-5 text-emerald-600"></i>
+              <span>Parámetros de Simulación</span>
+            </div>
+            <button id="btnResetParams" title="Restablecer valores por defecto" class="text-xs text-slate-400 hover:text-emerald-600 transition flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+
+          <!-- Presets rápidos -->
+          <div class="mb-5">
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Escenarios Predefinidos</label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button class="preset-btn px-2.5 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-800 font-medium hover:bg-emerald-100 transition" data-preset="base">
+                Caso Base (h = 0.5)
+              </button>
+              <button class="preset-btn px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition" data-preset="step1">
+                Paso Grande (h = 1.0)
+              </button>
+              <button class="preset-btn px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition" data-preset="fine">
+                Paso Fino (h = 0.25)
+              </button>
+              <button class="preset-btn px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition" data-preset="fast">
+                Campaña Rápida (r = 0.4)
+              </button>
+            </div>
+          </div>
+
+          <!-- Formulario de Inputs -->
+          <form id="simForm" class="space-y-4">
+            
+            <!-- y0: Condición inicial -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label for="inputY0" class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                  <span>Condición Inicial ($y_0$)</span>
+                </label>
+                <span class="text-xs text-slate-500 font-mono" id="valY0">20 animales</span>
+              </div>
+              <input type="number" id="inputY0" min="1" max="199" step="1" value="20" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+              <span class="text-[11px] text-slate-400">Animales adoptados al inicio ($t=0$).</span>
+            </div>
+
+            <!-- K: Capacidad de carga -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label for="inputK" class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                  <span>Capacidad de Carga ($K$)</span>
+                </label>
+                <span class="text-xs text-slate-500 font-mono" id="valK">200 animales</span>
+              </div>
+              <input type="number" id="inputK" min="20" max="2000" step="10" value="200" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+              <span class="text-[11px] text-slate-400">Techo máximo de hogares adoptantes disponibles.</span>
+            </div>
+
+            <!-- r: Tasa intrínseca -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label for="inputR" class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                  <span>Tasa de Difusión ($r$)</span>
+                </label>
+                <span class="text-xs text-slate-500 font-mono" id="valR">0.25 sem⁻¹</span>
+              </div>
+              <input type="number" id="inputR" min="0.01" max="2.0" step="0.01" value="0.25" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+              <span class="text-[11px] text-slate-400">Ritmo de propagación comunitaria por semana.</span>
+            </div>
+
+            <!-- h: Tamaño de paso -->
+            <div class="pt-2 border-t border-slate-100">
+              <div class="flex justify-between items-center mb-1">
+                <label for="inputH" class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                  <span>Tamaño de Paso ($h$)</span>
+                </label>
+                <span class="text-xs text-slate-500 font-mono" id="valH">0.5 semanas</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 mb-2">
+                <button type="button" class="btn-step text-xs py-1 px-1 rounded border border-slate-200 bg-slate-50 hover:bg-slate-100" data-h="1.0">1.0</button>
+                <button type="button" class="btn-step text-xs py-1 px-1 rounded border border-emerald-400 bg-emerald-50 font-bold text-emerald-800" data-h="0.5">0.5</button>
+                <button type="button" class="btn-step text-xs py-1 px-1 rounded border border-slate-200 bg-slate-50 hover:bg-slate-100" data-h="0.25">0.25</button>
+                <button type="button" class="btn-step text-xs py-1 px-1 rounded border border-slate-200 bg-slate-50 hover:bg-slate-100" data-h="0.1">0.1</button>
+              </div>
+              <input type="number" id="inputH" min="0.01" max="2.0" step="0.05" value="0.5" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+              <span class="text-[11px] text-slate-400">Paso de discretización numérica $\Delta t$.</span>
+            </div>
+
+            <!-- T: Tiempo máximo -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label for="inputT" class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                  <span>Tiempo Total ($T$)</span>
+                </label>
+                <span class="text-xs text-slate-500 font-mono" id="valT">25 semanas</span>
+              </div>
+              <input type="number" id="inputT" min="5" max="100" step="1" value="25" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+              <span class="text-[11px] text-slate-400">Horizonte de simulación temporal.</span>
+            </div>
+
+            <!-- Meta % -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label for="inputGoal" class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                  <span>Meta de Adopción (%)</span>
+                </label>
+                <span class="text-xs text-slate-500 font-mono" id="valGoal">80% de K</span>
+              </div>
+              <input type="number" id="inputGoal" min="10" max="99" step="5" value="80" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+            </div>
+
+            <button type="button" id="btnRunSim" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow-sm transition flex items-center justify-center gap-2 mt-4">
+              <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+              <span>Ejecutar Simulación</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Tarjeta de Validación de Entradas -->
+        <div id="validationAlert" class="hidden p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2.5">
+          <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+          <div id="validationMessage">Parámetros correctos.</div>
+        </div>
+      </aside>
+
+      <!-- Panel de Visualización (Gráficas y Errores) -->
+      <section class="lg:col-span-8 space-y-6">
+        
+        <!-- Pestañas de Gráfica -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3 mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-5 h-5 text-emerald-600"></i>
+                <span id="chartTitle">Evolución de Adopciones en el Tiempo</span>
+              </h2>
+              <p class="text-xs text-slate-500">Comparación simultánea: Solución Exacta vs Heun vs RK4</p>
+            </div>
+            
+            <!-- Switcher de Tipo de Gráfica -->
+            <div class="inline-flex rounded-lg bg-slate-100 p-1 text-xs font-medium text-slate-600 self-start sm:self-auto">
+              <button id="btnTabCurves" class="px-3 py-1.5 rounded-md bg-white text-emerald-700 shadow-sm font-semibold transition">
+                Curvas de Solución
+              </button>
+              <button id="btnTabErrors" class="px-3 py-1.5 rounded-md hover:text-slate-900 transition">
+                Errores Relativos (%)
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenedor del Canvas Chart.js -->
+          <div class="relative w-full h-[380px]">
+            <canvas id="mainChart"></canvas>
+          </div>
+
+          <!-- Leyenda explicativa -->
+          <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-600">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-slate-900 inline-block"></span>
+              <span>Solución Exacta (Analítica)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+              <span>Método de Heun (RK2)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+              <span>Runge-Kutta 4.° Orden (RK4)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-1 bg-amber-500 inline-block"></span>
+              <span id="labelLegendGoal">Meta 80% (160 animales)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interpretación Automática de Resultados -->
+        <div class="bg-gradient-to-br from-emerald-50/70 via-teal-50/50 to-slate-50 rounded-2xl border border-emerald-200/80 p-6">
+          <div class="flex items-center gap-2 text-emerald-900 font-bold text-base mb-3">
+            <i data-lucide="message-square-check" class="w-5 h-5 text-emerald-700"></i>
+            <span>Interpretación de Resultados y Respuesta al Desafío</span>
+          </div>
+          <div id="interpretationContent" class="text-sm text-slate-700 space-y-3 leading-relaxed">
+            <!-- Rellenado dinámicamente -->
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- Tabla Comparativa de Iteraciones -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4 mb-4">
+        <div>
+          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="table" class="w-5 h-5 text-emerald-600"></i>
+            <span>Tabla Comparativa de Valores y Errores por Paso</span>
+          </h2>
+          <p class="text-xs text-slate-500">Inspección de las aproximaciones discretas y cálculo de error punto a punto</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label for="tableFilter" class="text-xs text-slate-500">Ver:</label>
+          <select id="tableFilter" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-700 focus:ring-emerald-500">
+            <option value="all">Todos los pasos</option>
+            <option value="integers" selected>Solo semanas enteras (t = 0, 1, 2...)</option>
+            <option value="key">Puntos clave (inicio, meta, final)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabla responsiva -->
+      <div class="overflow-x-auto rounded-xl border border-slate-200/70">
+        <table class="min-w-full divide-y divide-slate-200 text-xs">
+          <thead class="bg-slate-50 font-semibold text-slate-700 text-left">
+            <tr>
+              <th scope="col" class="py-3 px-3.5">Paso $i$</th>
+              <th scope="col" class="py-3 px-3.5">Tiempo $t_i$ (sem)</th>
+              <th scope="col" class="py-3 px-3.5 bg-slate-100/60">Analítica $y(t_i)$</th>
+              <th scope="col" class="py-3 px-3.5 text-blue-900 bg-blue-50/50">Heun $y_i$</th>
+              <th scope="col" class="py-3 px-3.5 text-blue-800 bg-blue-50/30">Error Rel. Heun (%)</th>
+              <th scope="col" class="py-3 px-3.5 text-emerald-900 bg-emerald-50/50">RK4 $y_i$</th>
+              <th scope="col" class="py-3 px-3.5 text-emerald-800 bg-emerald-50/30">Error Rel. RK4 (%)</th>
+            </tr>
+          </thead>
+          <tbody id="simTableBody" class="divide-y divide-slate-100 font-mono text-slate-600">
+            <!-- Filas generadas dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-3 flex justify-between items-center text-xs text-slate-400">
+        <span id="tableRowsCount">Mostrando 0 registros</span>
+        <span>Errores calculados como: $|y_{\text{exacto}} - y_{\text{aprox}}| / y_{\text{exacto}} \times 100\%$</span>
+      </div>
+    </section>
+
+    <!-- Fundamento Teórico y Verificación Matemática (Accordion / Guía) -->
+    <section id="fundamentos" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+      <div class="flex items-center gap-2 text-slate-900 font-bold text-base pb-3 border-b border-slate-100 mb-4">
+        <i data-lucide="graduation-cap" class="w-5 h-5 text-emerald-600"></i>
+        <span>Fundamento Matemático del Modelo y Demostración</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-700 leading-relaxed">
+        
+        <!-- Bloque 1: Modelo y Solución Exacta -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2.5">
+          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+            1. Formulación y Solución Analítica
+          </h3>
+          <p>La ecuación diferencial ordinaria logística que describe el flujo de adopciones es:</p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-center">
+            $$\frac{dy}{dt} = r \cdot y \left(1 - \frac{y}{K}\right), \quad y(0) = y_0$$
+          </div>
+          <p>Integrando por separación de variables y fracciones parciales se obtiene:</p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-center">
+            $$y(t) = \frac{K}{1 + \left(\frac{K - y_0}{y_0}\right) e^{-rt}}$$
+          </div>
+          <p><strong>Comprobación de condición inicial:</strong></p>
+          <p class="font-mono text-slate-600">$$y(0) = \frac{K}{1 + \frac{K - y_0}{y_0}} = \frac{K}{\frac{K}{y_0}} = y_0 \quad \checkmark$$</p>
+        </div>
+
+        <!-- Bloque 2: Métodos Numéricos Heun y RK4 -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2.5">
+          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+            2. Algoritmos Numéricos Discretos
+          </h3>
+          <p><strong>Heun (RK2):</strong></p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-slate-800">
+            $$k_1 = f(t_i, y_i), \quad k_2 = f(t_i+h, \, y_i + h k_1)$$
+            $$y_{i+1} = y_i + \frac{h}{2}(k_1 + k_2) \quad [\mathcal{O}(h^2)]$$
+          </div>
+          <p><strong>Runge-Kutta 4.° Orden (RK4):</strong></p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-slate-800">
+            $$k_1 = f(t_i, y_i), \quad k_2 = f(t_i + \tfrac{h}{2}, y_i + \tfrac{h}{2}k_1)$$
+            $$k_3 = f(t_i + \tfrac{h}{2}, y_i + \tfrac{h}{2}k_2), \quad k_4 = f(t_i + h, y_i + h k_3)$$
+            $$y_{i+1} = y_i + \frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4) \quad [\mathcal{O}(h^4)]$$
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        <p class="font-medium text-slate-300">Desafío Individual de Métodos Numéricos · Ecuaciones Diferenciales Ordinarias</p>
+        <p class="text-slate-500 mt-0.5">Solución analítica, Método de Heun y Runge-Kutta de 4.º orden</p>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <span class="inline-flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i> Simulación Funcional</span>
+        <span class="inline-flex items-center gap-1"><i data-lucide="code" class="w-3.5 h-3.5 text-blue-400"></i> Open Source</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

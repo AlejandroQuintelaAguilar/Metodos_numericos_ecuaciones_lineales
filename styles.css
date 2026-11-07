@@ -1,0 +1,46 @@
+/* Estilos personalizados para el Simulador EDO */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar para la tabla */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animaciones sutiles */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Tooltips y selects */
+select:focus, input:focus {
+  outline: none;
+}
+
+/* Estilo de impresión para reportes */
+@media print {
+  header, footer, aside, #btnExportCSV, .preset-btn {
+    display: none !important;
+  }
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+}
