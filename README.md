@@ -5,9 +5,11 @@
 [![Tecnologías](https://img.shields.io/badge/Stack-HTML5%20%7C%20Tailwind%20%7C%20Chart.js-teal.svg)]()
 
 > **Proyecto:** Desafío Individual de Modelado con Ecuaciones Diferenciales Ordinarias (EDO) de Primer Orden  
-> **Estudiante:** [Ingresa aquí tu Nombre Completo]  
+> **Estudiante:** Alejandro Quintela Aguilar  
 > **Título del Desafío:** *«Huellitas Seguras: Dinámica de Adopción Comunitaria y Capacidad de Acogida»*  
 > **Materia:** Métodos Numéricos  
+> **Repositorio GitHub:** [Metodos_numericos_ecuaciones_lineales](https://github.com/AlejandroQuintelaAguilar/Metodos_numericos_ecuaciones_lineales)  
+> **Simulador en Vivo:** [GitHub Pages](https://alejandroquintelaaguilar.github.io/Metodos_numericos_ecuaciones_lineales/)  
 > **Fecha de Entrega:** Noviembre 2026  
 
 ---
@@ -129,8 +131,8 @@ $$t^* = \frac{\ln(36)}{0.25} = 4 \cdot \ln(36) \approx \mathbf{14.334 \text{ sem
 No requiere instalación de librerías ni dependencias pesadas:
 1. Clona o descarga este repositorio:
    ```bash
-   git clone https://github.com/TU_USUARIO/simulador-edo-adopciones.git
-   cd simulador-edo-adopciones
+   git clone https://github.com/AlejandroQuintelaAguilar/Metodos_numericos_ecuaciones_lineales.git
+   cd Metodos_numericos_ecuaciones_lineales
    ```
 2. Opción A: Haz doble clic directamente en el archivo `index.html` para abrirlo en cualquier navegador web moderno (Chrome, Edge, Firefox, Safari).
 3. Opción B: Si deseas levantarlo mediante un servidor local:
@@ -141,11 +143,16 @@ No requiere instalación de librerías ni dependencias pesadas:
    ```
 
 ### Despliegue en GitHub Pages (Gratis y en 1 minuto)
-1. Sube este repositorio a tu cuenta de GitHub.
+1. Sube este repositorio a tu cuenta de GitHub:
+   ```bash
+   git remote add origin https://github.com/AlejandroQuintelaAguilar/Metodos_numericos_ecuaciones_lineales.git
+   git branch -M main
+   git push -u origin main
+   ```
 2. En GitHub, ve a **Settings** > pestaña **Pages**.
-3. En **Branch**, selecciona `main` (o `master`) y carpeta `/ (root)`.
-4. Haz clic en **Save**. En 1 o 2 minutos tendrás tu URL pública del tipo:
-   `https://TU_USUARIO.github.io/simulador-edo-adopciones/`
+3. En **Branch**, selecciona `main` y carpeta `/ (root)`.
+4. Haz clic en **Save**. En 1 o 2 minutos tendrás tu URL pública activa en:
+   👉 **`https://alejandroquintelaaguilar.github.io/Metodos_numericos_ecuaciones_lineales/`**
 
 ---
 
@@ -171,7 +178,7 @@ No requiere instalación de librerías ni dependencias pesadas:
 
 | Segundo | Contenido / Pantalla | Diálogo sugerido |
 | :---: | :--- | :--- |
-| **00 - 10 s** | Portada y Contexto | *"Hola, en este proyecto de Métodos Numéricos modelamos la dinámica de adopción de un refugio comunitario animal mediante una EDO logística de primer orden con condición inicial."* |
+| **00 - 10 s** | Portada y Contexto | *"Hola, soy Alejandro Quintela Aguilar. En este proyecto de Métodos Numéricos modelamos la dinámica de adopción de un albergue comunitario animal mediante una EDO logística de primer orden con condición inicial."* |
 | **11 - 25 s** | EDO y Solución Analítica | *"Formulamos la ecuación dy/dt = r*y*(1 - y/K) con y(0)=20. Resolviendo analíticamente por fracciones parciales demostramos que la meta del 80% (160 animales) se alcanza exactamente a las 14.33 semanas."* |
 | **26 - 45 s** | Métodos Numéricos y Demo App | *"Implementamos los métodos de Heun (RK2) y Runge-Kutta 4 en esta aplicación interactiva. Al comparar con h=1.0 y h=0.5, RK4 alcanza una precisión hasta 1,800 veces superior a Heun, validando experimentalmente sus órdenes de convergencia O(h²) y O(h⁴)."* |
 | **46 - 60 s** | Conclusión Comunitaria | *"La simulación permite a la comunidad planificar sus campañas de difusión antes de la semana 12 para evitar la saturación. Todo el código y la app están disponibles en GitHub."* |
